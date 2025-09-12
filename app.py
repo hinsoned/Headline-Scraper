@@ -2,6 +2,8 @@
 
 import requests
 from bs4 import BeautifulSoup
+import pandas as pd
+from datetime import datetime
 
 def print_headlines(headlines, url):
     print(f"{len(headlines)} headlines found on {url}")
@@ -31,10 +33,25 @@ def main():
     "https://www.cnn.com/entertainment",
     ]
 
+    all_data = []
+
     for URL in CNN_URLs:
         headlines = get_headlines(URL)
         print_headlines(headlines, URL)
         print("\n")
+
+        timestamp = datetime.now()
+        for headline in headlines:
+            all_data.append({
+                "timestamp": timestamp,
+                "headline": headline,
+                "url": URL
+            })
+
+    df = pd.DataFrame(all_data)
+    df.to_csv("cnn_headlines.csv", index=False)
+    print(f"Data saved to cnn_headlines.csv")
+        
 
 if __name__ == "__main__":
     main()
