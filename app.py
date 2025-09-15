@@ -8,9 +8,11 @@ import re
 import nltk
 from nltk.corpus import stopwords
 from collections import Counter
+import matplotlib.pyplot as plt
 
 # Download stopwords
 nltk.download("stopwords")
+stopwords = set(stopwords.words("english"))
 
 # CNN URLs and topics
 CNN_URLs = [
@@ -56,7 +58,7 @@ def clean_text(text):
     words = text.split()
     filtered_words = []
     for w in words:
-        if w not in stopwords.words("english"):
+        if w not in stopwords:
             filtered_words.append(w)
     return filtered_words
 
@@ -88,7 +90,9 @@ def main():
     all_words = count_words(df)
     print(f"Total words: {len(all_words)}")
     print(f"Unique words: {len(set(all_words))}")
-    print(f"Most common words: {Counter(all_words).most_common(10)}")
+    #Counter returns a list of tuples with keys that are the words and values that are the count of the words
+    word_counts = Counter(all_words)
+    print(f"Most common words: {word_counts.most_common(10)}")
 
 if __name__ == "__main__":
     main()
