@@ -4,6 +4,13 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
+import re
+import nltk
+from nltk.corpus import stopwords
+from collections import Counter
+
+# Download stopwords
+nltk.download("stopwords")
 
 # CNN URLs and topics
 CNN_URLs = [
@@ -35,6 +42,24 @@ def get_headlines(url):
 
     return headlines
 
+# Count words
+def count_words(df):
+    all_words = []
+    for headline in df["headline"]:
+        all_words.extend(clean_text(headline))
+    return all_words
+
+# Clean text
+def clean_text(text):
+    text = text.lower()
+    text = re.sub(r"[^a-z0-9\s]", "", text)
+    words = text.split()
+    filtered_words = []
+    for w in words:
+        if w not in stopwords.words("english"):
+            filtered_words.append(w)
+    return filtered_words
+
 # Main function
 def main():
     all_data = []
@@ -59,7 +84,11 @@ def main():
     df = pd.DataFrame(all_data)
     df.to_csv("cnn_headlines.csv", index=False)
     print(f"Data saved to cnn_headlines.csv")
-        
+
+    all_words = count_words(df)
+    print(f"Total words: {len(all_words)}")
+    print(f"Unique words: {len(set(all_words))}")
+    print(f"Most common words: {Counter(all_words).most_common(10)}")
 
 if __name__ == "__main__":
     main()
