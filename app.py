@@ -9,6 +9,7 @@ import nltk
 from nltk.corpus import stopwords
 from collections import Counter
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Download stopwords
 nltk.download("stopwords")
@@ -62,6 +63,33 @@ def clean_text(text):
             filtered_words.append(w)
     return filtered_words
 
+# Create counter
+def create_counter(all_words):
+    print(f"Total words: {len(all_words)}")
+    print(f"Unique words: {len(set(all_words))}")
+    #Counter returns a list of tuples with keys that are the words and values that are the count of the words
+    word_counts = Counter(all_words)
+    print(f"Most common words: {word_counts.most_common(15)}")
+
+    return word_counts
+
+# Create plot
+def create_plot(word_counts, timestamp):
+    words = []
+    counts = []
+
+    for word, count in word_counts.most_common(15):
+        words.append(word)
+        counts.append(count)
+
+    sns.set_style("whitegrid")
+    plt.figure(figsize=(12, 8))#This makes the canvas for the plot
+    sns.barplot(x=list(words), y=list(counts), palette="Blues_d")#seaborn finds the active plt.figure() and plots the barplot on it
+    plt.title(f"Top 15 Most Common Words in CNN Headlines {timestamp}")
+    plt.ylabel("Frequency")
+    plt.xlabel("Words")
+    plt.show()#This shows the plot on the screen
+
 # Main function
 def main():
     all_data = []
@@ -83,16 +111,17 @@ def main():
                 "topic": topic
             })
 
+    # Save data to csv
     df = pd.DataFrame(all_data)
-    df.to_csv("cnn_headlines.csv", index=False)
-    print(f"Data saved to cnn_headlines.csv")
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    df.to_csv(f"cnn_headlines_{timestamp}.csv", index=False)
+    print(f"Data saved to cnn_headlines_{timestamp}.csv")
 
+    # Count words
     all_words = count_words(df)
-    print(f"Total words: {len(all_words)}")
-    print(f"Unique words: {len(set(all_words))}")
-    #Counter returns a list of tuples with keys that are the words and values that are the count of the words
-    word_counts = Counter(all_words)
-    print(f"Most common words: {word_counts.most_common(10)}")
+    word_counts = create_counter(all_words)
+    # Create plot
+    create_plot(word_counts, timestamp)
 
 if __name__ == "__main__":
     main()
