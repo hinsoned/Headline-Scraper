@@ -10,6 +10,10 @@ from nltk.corpus import stopwords
 from collections import Counter
 import matplotlib.pyplot as plt
 import seaborn as sns
+from textblob import TextBlob
+import os
+import platform
+import subprocess
 
 # Download stopwords
 nltk.download("stopwords")
@@ -74,7 +78,7 @@ def create_counter(all_words):
     return word_counts
 
 # Create plot
-def create_plot(word_counts, timestamp):
+def plot_word_counts(word_counts, timestamp):
     words = []
     counts = []
 
@@ -88,7 +92,54 @@ def create_plot(word_counts, timestamp):
     plt.title(f"Top 15 Most Common Words in CNN Headlines {timestamp}")
     plt.ylabel("Frequency")
     plt.xlabel("Words")
-    plt.show()#This shows the plot on the screen
+    plt.savefig("word_counts.png")#This saves the plot to a file
+    open_image("word_counts.png")
+    plt.close()
+
+# Sentiment analysis
+def analyze_sentiment(df):
+    polarities = []
+    subjectivities = []
+    for headline in df["headline"]:
+        blob = TextBlob(headline)
+        polarities.append(blob.sentiment.polarity)
+        subjectivities.append(blob.sentiment.subjectivity)
+    df["polarity"] = polarities
+    df["subjectivity"] = subjectivities
+    return df
+
+# Create plot for sentiment
+def plot_sentiment(df, timestamp):
+    #Polarity Histogram
+    plt.figure(figsize=(12, 8))
+    sns.histplot(df["polarity"], bins=20, kde=True)
+    plt.title(f"Polarity of CNN Headlines {timestamp}")
+    plt.xlabel("Polarity")
+    plt.ylabel("Frequency")
+    plt.savefig("sentiment.png")
+    open_image("sentiment.png")
+    plt.close()
+
+    #Subjectivity Histogram
+    plt.figure(figsize=(12, 8))
+    sns.histplot(df["subjectivity"], bins=20, kde=True)
+    plt.title(f"Subjectivity of CNN Headlines {timestamp}")
+    plt.xlabel("Subjectivity")
+    plt.ylabel("Frequency")
+    plt.savefig("subjectivity.png")
+    open_image("subjectivity.png")
+    plt.close()
+
+# Open image
+def open_image(path):
+    system = platform.system()#This gets the operating system
+    if system == "Darwin":  # macOS
+        subprocess.call(["open", path])#This opens the image on macOS
+    elif system == "Windows":
+        os.startfile(path)#This opens the image on Windows
+    else:  # Linux
+        subprocess.call(["xdg-open", path])#This opens the image on Linux
+    
 
 # Main function
 def main():
@@ -111,17 +162,26 @@ def main():
                 "topic": topic
             })
 
-    # Save data to csv
+    # Create dataframe
     df = pd.DataFrame(all_data)
+
+    # Sentiment analysis
+    df = analyze_sentiment(df)
+    # Create plot for sentiment
+    plot_sentiment(df, timestamp)
+
+    # Save dataframe to csv
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     df.to_csv(f"cnn_headlines_{timestamp}.csv", index=False)
     print(f"Data saved to cnn_headlines_{timestamp}.csv")
 
     # Count words
     all_words = count_words(df)
+    # Create counter
     word_counts = create_counter(all_words)
-    # Create plot
-    create_plot(word_counts, timestamp)
+    # Create plot for word counts
+    plot_word_counts(word_counts, timestamp)
+
 
 if __name__ == "__main__":
     main()
