@@ -130,7 +130,58 @@ def plot_sentiment(df, timestamp):
     open_image("subjectivity.png")
     plt.close()
 
-# Open image
+# Most subjective and polar headlines
+def most_subjective_headlines(df):
+    subjective_df = df.sort_values(by="subjectivity", ascending=False)
+    print(f"Most subjective headlines: \n")
+    for index, row in subjective_df.head(10).iterrows():
+        print(f"{index}. {row['headline']} | Subjectivity: {row['subjectivity']} | Topic: {row['topic']}")
+    print("\n")
+
+    print(f"Least subjective headlines: \n")
+    for index, row in subjective_df.tail(10).iterrows():
+        print(f"{index}. {row['headline']} | Subjectivity: {row['subjectivity']} | Topic: {row['topic']}")
+    print("\n")
+
+    print(f"Average subjectivity: {subjective_df['subjectivity'].mean()}")
+    print("\n")
+
+    return subjective_df
+
+def most_polar_headlines(df):
+    polar_df = df.sort_values(by="polarity", ascending=False)
+    print(f"Most polar headlines: \n")
+    for index, row in polar_df.head(10).iterrows():
+        print(f"{index}. {row['headline']} | Polarity: {row['polarity']} | Topic: {row['topic']}")  
+    print("\n")
+
+    print(f"Least polar headlines: \n")
+    for index, row in polar_df.tail(10).iterrows():
+        print(f"{index}. {row['headline']} | Polarity: {row['polarity']} | Topic: {row['topic']}")
+    print("\n")
+
+    print(f"Average polarity: {polar_df['polarity'].mean()}")
+    print("\n")
+
+    return polar_df
+
+# Average sentiment for top keywords
+def avg_sentiment_for_top_keywords(df, top_keywords):
+    for word in top_keywords:
+        relevant_rows = df[df["keywords"].apply(lambda kws: word in kws)]
+        avg_polarity = relevant_rows['polarity'].mean()
+        avg_subjectivity = relevant_rows['subjectivity'].mean()
+        print(f"Average sentiment for {word}: {avg_polarity}")
+        print(f"Average subjectivity for {word}: {avg_subjectivity}")
+        print("\n")
+        
+
+# Add keywords to dataframe
+def add_keywords(df):
+    df["keywords"] = df["headline"].apply(clean_text)
+    return df
+
+# Open image    
 def open_image(path):
     system = platform.system()#This gets the operating system
     if system == "Darwin":  # macOS
@@ -166,22 +217,38 @@ def main():
     df = pd.DataFrame(all_data)
 
     # Sentiment analysis
-    df = analyze_sentiment(df)
-    # Create plot for sentiment
-    plot_sentiment(df, timestamp)
+    df = analyze_sentiment(df) #This adds the polarity and subjectivity columns to the dataframe
 
-    # Save dataframe to csv
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    df.to_csv(f"cnn_headlines_{timestamp}.csv", index=False)
-    print(f"Data saved to cnn_headlines_{timestamp}.csv")
+    # Add keywords to dataframe
+    df = add_keywords(df)# This adds the keywords column to the dataframe
 
     # Count words
     all_words = count_words(df)
     # Create counter
     word_counts = create_counter(all_words)
+
     # Create plot for word counts
     plot_word_counts(word_counts, timestamp)
 
+    # Create plot for sentiment
+    plot_sentiment(df, timestamp) 
+
+    #Most subjective and polar headlines
+    subjective_df = most_subjective_headlines(df)
+    polar_df = most_polar_headlines(df)
+
+    # Get top keywords
+    top_keyword_tuples = word_counts.most_common(10)# This returns a list of tuples with the word and the count
+    top_keywords = []
+    for tuple in top_keyword_tuples:
+        word = tuple[0]
+        top_keywords.append(word)
+    avg_sentiment_for_top_keywords(df, top_keywords)
+
+    # Save dataframe to csv
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    df.to_csv(f"cnn_headlines_{timestamp}.csv", index=False)
+    print(f"Data saved to cnn_headlines_{timestamp}.csv")
 
 if __name__ == "__main__":
     main()
