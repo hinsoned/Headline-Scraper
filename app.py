@@ -78,7 +78,7 @@ def create_counter(all_words):
     return word_counts
 
 # Create plot
-def plot_word_counts(word_counts, timestamp):
+def plot_word_counts(word_counts, timestamp, folder_name):
     words = []
     counts = []
 
@@ -92,8 +92,8 @@ def plot_word_counts(word_counts, timestamp):
     plt.title(f"Top 15 Most Common Words in CNN Headlines {timestamp}")
     plt.ylabel("Frequency")
     plt.xlabel("Words")
-    plt.savefig("word_counts.png")#This saves the plot to a file
-    open_image("word_counts.png")
+    plt.savefig(os.path.join(folder_name, f"word_counts{timestamp}.png"))#This saves the plot to a file in the report folder
+    open_image(os.path.join(folder_name, f"word_counts{timestamp}.png"))
     plt.close()
 
 # Sentiment analysis
@@ -109,16 +109,18 @@ def analyze_sentiment(df):
     return df
 
 # Create plot for sentiment
-def plot_sentiment(df, timestamp):
+def plot_sentiment(df, timestamp, folder_name):
     #Polarity Histogram
     plt.figure(figsize=(12, 8))
     sns.histplot(df["polarity"], bins=20, kde=True)
     plt.title(f"Polarity of CNN Headlines {timestamp}")
     plt.xlabel("Polarity")
     plt.ylabel("Frequency")
-    plt.savefig("sentiment.png")
-    open_image("sentiment.png")
+    plt.savefig(os.path.join(folder_name, f"sentiment{timestamp}.png"))
+    open_image(os.path.join(folder_name, f"sentiment{timestamp}.png"))
     plt.close()
+
+    print(f"Saved sentiment{timestamp}.png")
 
     #Subjectivity Histogram
     plt.figure(figsize=(12, 8))
@@ -126,9 +128,11 @@ def plot_sentiment(df, timestamp):
     plt.title(f"Subjectivity of CNN Headlines {timestamp}")
     plt.xlabel("Subjectivity")
     plt.ylabel("Frequency")
-    plt.savefig("subjectivity.png")
-    open_image("subjectivity.png")
+    plt.savefig(os.path.join(folder_name, f"subjectivity{timestamp}.png"))
+    open_image(os.path.join(folder_name, f"subjectivity{timestamp}.png"))
     plt.close()
+
+    print(f"Saved subjectivity{timestamp}.png")
 
 # Most subjective and polar headlines
 def most_subjective_headlines(df):
@@ -165,21 +169,65 @@ def most_polar_headlines(df):
 
     return polar_df
 
+# Get top keywords
+def get_top_keywords(word_counts):
+    top_keyword_tuples = word_counts.most_common(10)# This returns a list of tuples with the word and the count
+    top_keywords = []
+    for tuple in top_keyword_tuples:
+        word = tuple[0]
+        top_keywords.append(word)
+    return top_keywords
+
 # Average sentiment for top keywords
-def avg_sentiment_for_top_keywords(df, top_keywords):
+def avg_sentiment_for_top_keywords(df, word_counts):
+
+    top_keywords = get_top_keywords(word_counts)
+
+    avg_data = []
     for word in top_keywords:
         relevant_rows = df[df["keywords"].apply(lambda kws: word in kws)]
         avg_polarity = relevant_rows['polarity'].mean()
         avg_subjectivity = relevant_rows['subjectivity'].mean()
+        avg_data.append({
+            "word": word,
+            "avg_polarity": avg_polarity,
+            "avg_subjectivity": avg_subjectivity
+        })
         print(f"Average sentiment for {word}: {avg_polarity}")
         print(f"Average subjectivity for {word}: {avg_subjectivity}")
         print("\n")
         
+    avg_df = pd.DataFrame(avg_data)
+    return avg_df
 
 # Add keywords to dataframe
 def add_keywords(df):
     df["keywords"] = df["headline"].apply(clean_text)
     return df
+
+# Create plot for average sentiment
+def plot_avg_sentiment(avg_df, timestamp, folder_name):
+    plt.figure(figsize=(12, 8))
+    sns.barplot(x="word", y="avg_polarity", data=avg_df)
+    plt.title(f"Average Polarity of Top Keywords {timestamp}")
+    plt.xlabel("Word")
+    plt.ylabel("Average Polarity")
+    plt.savefig(os.path.join(folder_name, f"avg_polarity{timestamp}.png"))
+    open_image(os.path.join(folder_name, f"avg_polarity{timestamp}.png"))
+    plt.close()
+
+    print(f"Saved avg_polarity{timestamp}.png")
+
+    plt.figure(figsize=(12, 8))
+    sns.barplot(x="word", y="avg_subjectivity", data=avg_df)
+    plt.title(f"Average Subjectivity of Top Keywords {timestamp}")
+    plt.xlabel("Word")
+    plt.ylabel("Average Subjectivity")
+    plt.savefig(os.path.join(folder_name, f"avg_subjectivity{timestamp}.png"))
+    open_image(os.path.join(folder_name, f"avg_subjectivity{timestamp}.png"))
+    plt.close()
+
+    print(f"Saved avg_subjectivity{timestamp}.png")
 
 # Open image    
 def open_image(path):
@@ -190,17 +238,34 @@ def open_image(path):
         os.startfile(path)#This opens the image on Windows
     else:  # Linux
         subprocess.call(["xdg-open", path])#This opens the image on Linux
-    
 
-# Main function
+def save_to_excel(df, timestamp, folder_name):
+    filename = f"cnn_report_{timestamp}.xlsx"
+    path = os.path.join(folder_name, filename)
+    
+    with pd.ExcelWriter(path, engine="xlsxwriter") as writer:
+        df.to_excel(writer, sheet_name="Headlines", index=False)
+        # Add top words
+        #all_words = [word for kws in df["keywords"] for word in kws]
+        #word_counts = Counter(all_words).most_common(20)
+        #pd.DataFrame(word_counts, columns=["Word", "Count"]).to_excel(writer, sheet_name="Top Words", index=False)
+    print(f"Saved Excel: {path}")
+
+def save_to_csv(df, timestamp, folder_name):
+    csv_filename = f"cnn_headlines_{timestamp}.csv"
+    csv_path = os.path.join(folder_name, csv_filename)
+    df.to_csv(csv_path, index=False)
+    print(f"Data saved to {csv_path}")
+    
+# The pipeline
 def main():
     all_data = []
-
+    # Loop through the CNN URLs and get the headlines
     for entry in CNN_URLs:
         url = entry["url"]
         topic = entry["topic"]
 
-        headlines = get_headlines(url)
+        headlines = get_headlines(url)#This returns a list of headlines
         print_headlines(headlines, url)
         print("\n")
 
@@ -222,33 +287,37 @@ def main():
     # Add keywords to dataframe
     df = add_keywords(df)# This adds the keywords column to the dataframe
 
-    # Count words
+    # Create folder name for the report
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    folder_name = f"cnn_reports_{timestamp}"
+
+    # Create folder for the report
+    os.makedirs(folder_name, exist_ok=True)
+
+    # Create a list of all the words in the headlines after cleaning
     all_words = count_words(df)
-    # Create counter
+    # Create counter to count the frequency of each word
     word_counts = create_counter(all_words)
 
-    # Create plot for word counts
-    plot_word_counts(word_counts, timestamp)
+    # Create plot for word counts to visualize the most common words
+    plot_word_counts(word_counts, timestamp, folder_name)
 
     # Create plot for sentiment
-    plot_sentiment(df, timestamp) 
+    plot_sentiment(df, timestamp, folder_name) 
 
     #Most subjective and polar headlines
     subjective_df = most_subjective_headlines(df)
     polar_df = most_polar_headlines(df)
 
-    # Get top keywords
-    top_keyword_tuples = word_counts.most_common(10)# This returns a list of tuples with the word and the count
-    top_keywords = []
-    for tuple in top_keyword_tuples:
-        word = tuple[0]
-        top_keywords.append(word)
-    avg_sentiment_for_top_keywords(df, top_keywords)
+    # Get average sentiment for top keywords
+    avg_df = avg_sentiment_for_top_keywords(df, word_counts)
+    plot_avg_sentiment(avg_df, timestamp, folder_name)
+
+    # Save dataframe to excel
+    save_to_excel(df, timestamp, folder_name)
 
     # Save dataframe to csv
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    df.to_csv(f"cnn_headlines_{timestamp}.csv", index=False)
-    print(f"Data saved to cnn_headlines_{timestamp}.csv")
+    save_to_csv(df, timestamp, folder_name)
 
 if __name__ == "__main__":
     main()
