@@ -47,3 +47,12 @@ Clone this repository and install the required dependencies:
 git clone https://github.com/hinsoned/Headline-Scraper.git
 cd Headline-Scraper
 pip install -r requirements.txt
+
+```
+
+Then run the code from the terminal using one of these commands (your choice of command will be dependent on your version of python):
+
+```bash
+python3 app.py
+pthon app.py
+```
