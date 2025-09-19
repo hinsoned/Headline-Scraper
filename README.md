@@ -54,7 +54,7 @@ Then run the code from the terminal using one of these commands (your choice of 
 
 ```bash
 python3 app.py
-pthon app.py
+python app.py
 ```
 
 ---
