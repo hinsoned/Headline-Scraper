@@ -1,4 +1,4 @@
-# CNN Headline Scraper & Sentiment Analyzer 📰✨
+# CNN Headline Scraper & Sentiment Analyzer 📰
 
 Analyze the mood of the news! This Python project scrapes headlines from CNN, uncovers the most common keywords, and visualizes sentiment trends related to the most common keywords at that time.  
 
@@ -39,3 +39,11 @@ Analyze the mood of the news! This Python project scrapes headlines from CNN, un
 
 ---
 
+## 🔹 Usage
+
+Clone this repository and install the required dependencies:
+
+```bash
+git clone https://github.com/hinsoned/Headline-Scraper.git
+cd Headline-Scraper
+pip install -r requirements.txt
