@@ -1,4 +1,4 @@
-# CNN Headline Scraper & Sentiment Analyzer 📰
+# CNN Headline Scraper & Sentiment Analyzer (Phase 1) 📰
 
 Analyze the mood of the news! This Python project scrapes headlines from CNN, uncovers the most common keywords, and visualizes sentiment trends related to the most common keywords at that time.  
 
@@ -27,7 +27,7 @@ Analyze the mood of the news! This Python project scrapes headlines from CNN, un
 
 ---
 
-## 🔹 Example Output
+## 🔹 Example Output Images
 
 **Top Keywords by Frequency**  
 ![word_counts_example](screenshots/word_count_example.png)  
@@ -56,3 +56,21 @@ Then run the code from the terminal using one of these commands (your choice of 
 python3 app.py
 pthon app.py
 ```
+
+---
+
+## 🔹 Expected Output
+
+You should see:
+- A timestamped folder called cnn_reeports_<timestamp> 
+- Inside that folder you should find:
+    - avg_polarity<timestamp>.png
+    - avg_subjectivity<timestamp>.png
+    - cnn_headlines_<timestamp>.csv
+    - cnn_report_<timestamp>.xlsx
+    - sentiment<timestamp>.png
+    - subjectivity<timestamp>.png
+    - word_counts<timestamp>.png
+
+## 🔹 Notes
+I anticipate adding more phases to this project in the future including scraping other news sites, creating a database of scrapings from each day, hosting this information, and creating an API for this database.

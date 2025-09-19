@@ -4,5 +4,4 @@ cnn_headlines.csv
 *.xlsx
 .DS_Store
 cnn_headlines_*.csv
-
 cnn_reports_*
