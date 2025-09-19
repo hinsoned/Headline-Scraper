@@ -1,6 +1,8 @@
 cnn_headlines.csv
 *.csv
 *.csv
-*.png
 *.xlsx
 .DS_Store
+cnn_headlines_*.csv
+
+cnn_reports_*
