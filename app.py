@@ -371,6 +371,29 @@ def main():
     # Add data to the database
     save_to_database(df, session)
 
+    #Test queries
+    results = session.query(Headline).filter(
+        Headline.keywords.like(f'%"trump"%')
+    ).all()
+
+    print("Keywords like '%trump%'")
+    print("\n")
+
+    for r in results:
+        print(r.headline)
+    print(len(results))
+
+    next_results = session.query(Headline).filter(
+        (Headline.polarity > 0) & (Headline.subjectivity < 0.5)
+    ).all()
+
+    print("Polarity > 0.5 and Subjectivity < 0.5")
+    print("\n")
+    
+    for r in next_results:
+        print(r.headline)
+    print(len(next_results))
+
     #close session
     session.close()
 
