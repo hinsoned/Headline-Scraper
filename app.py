@@ -296,7 +296,6 @@ def save_to_database(df, session):
     # Add the records to the database
     session.add_all(records)
     session.commit()
-    session.close()
     print(f"Saved {len(records)} headlines to the database.")
 
 # The pipeline
@@ -371,6 +370,9 @@ def main():
 
     # Add data to the database
     save_to_database(df, session)
+
+    #close session
+    session.close()
 
 if __name__ == "__main__":
     main()
