@@ -15,6 +15,25 @@ import os
 import platform
 import subprocess
 
+#imports for database use: 
+import json
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+# Define the database model. Note that keywords needs to be a Text type because it is a list of strings so we must convert it to a string.
+Base = declarative_base()
+class Headline(Base):
+    __tablename__ = "headlines"
+
+    id = Column(Integer, primary_key=True)
+    timestamp = Column(DateTime, nullable=False)
+    headline = Column(Text, nullable=False)
+    url = Column(String, nullable=False)
+    topic = Column(String, nullable=False)
+    polarity = Column(Float, nullable=True)
+    subjectivity = Column(Float, nullable=True)
+    keywords = Column(Text, nullable=True)
+
 # Download stopwords
 nltk.download("stopwords")
 stopwords = set(stopwords.words("english"))
@@ -256,7 +275,29 @@ def save_to_csv(df, timestamp, folder_name):
     csv_path = os.path.join(folder_name, csv_filename)
     df.to_csv(csv_path, index=False)
     print(f"Data saved to {csv_path}")
-    
+
+def save_to_database(df, session):
+    # Convert the keywords column to JSON strings for all rows at once
+    df["keywords_json"] = df["keywords"].apply(json.dumps)
+    #this creates a list of records to add to the database for each row in the dataframe
+    records = []
+    for _, row in df.iterrows():
+        record = Headline(
+            timestamp=row["timestamp"],
+            headline=row["headline"],
+            url=row["url"],
+            topic=row["topic"],
+            polarity=row["polarity"],
+            subjectivity=row["subjectivity"],
+            keywords=row["keywords_json"]
+        )
+        records.append(record)
+
+    # Add the records to the database
+    session.add_all(records)
+    session.commit()
+    print(f"Saved {len(records)} headlines to the database.")
+
 # The pipeline
 def main():
     all_data = []
@@ -318,6 +359,43 @@ def main():
 
     # Save dataframe to csv
     save_to_csv(df, timestamp, folder_name)
+
+    #Set up database
+    engine = create_engine("sqlite:///headlines.db")
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    # Create the table (if it doesn't exist)
+    Base.metadata.create_all(engine)
+
+    # Add data to the database
+    save_to_database(df, session)
+
+    #Test queries
+    results = session.query(Headline).filter(
+        Headline.keywords.like(f'%"trump"%')
+    ).all()
+
+    print("Keywords like '%trump%'")
+    print("\n")
+
+    for r in results:
+        print(r.headline)
+    print(len(results))
+
+    next_results = session.query(Headline).filter(
+        (Headline.polarity > 0) & (Headline.subjectivity < 0.5)
+    ).all()
+
+    print("Polarity > 0.5 and Subjectivity < 0.5")
+    print("\n")
+    
+    for r in next_results:
+        print(r.headline)
+    print(len(next_results))
+
+    #close session
+    session.close()
 
 if __name__ == "__main__":
     main()

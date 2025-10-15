@@ -5,3 +5,4 @@ cnn_headlines.csv
 .DS_Store
 cnn_headlines_*.csv
 cnn_reports_*
+headlines.db
