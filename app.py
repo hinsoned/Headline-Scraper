@@ -112,7 +112,7 @@ def plot_word_counts(word_counts, timestamp, folder_name):
     plt.ylabel("Frequency")
     plt.xlabel("Words")
     plt.savefig(os.path.join(folder_name, f"word_counts{timestamp}.png"))#This saves the plot to a file in the report folder
-    open_image(os.path.join(folder_name, f"word_counts{timestamp}.png"))
+    #open_image(os.path.join(folder_name, f"word_counts{timestamp}.png"))
     plt.close()
 
 # Sentiment analysis
@@ -136,7 +136,7 @@ def plot_sentiment(df, timestamp, folder_name):
     plt.xlabel("Polarity")
     plt.ylabel("Frequency")
     plt.savefig(os.path.join(folder_name, f"sentiment{timestamp}.png"))
-    open_image(os.path.join(folder_name, f"sentiment{timestamp}.png"))
+    #open_image(os.path.join(folder_name, f"sentiment{timestamp}.png"))
     plt.close()
 
     print(f"Saved sentiment{timestamp}.png")
@@ -148,7 +148,7 @@ def plot_sentiment(df, timestamp, folder_name):
     plt.xlabel("Subjectivity")
     plt.ylabel("Frequency")
     plt.savefig(os.path.join(folder_name, f"subjectivity{timestamp}.png"))
-    open_image(os.path.join(folder_name, f"subjectivity{timestamp}.png"))
+    #open_image(os.path.join(folder_name, f"subjectivity{timestamp}.png"))
     plt.close()
 
     print(f"Saved subjectivity{timestamp}.png")
@@ -232,7 +232,7 @@ def plot_avg_sentiment(avg_df, timestamp, folder_name):
     plt.xlabel("Word")
     plt.ylabel("Average Polarity")
     plt.savefig(os.path.join(folder_name, f"avg_polarity{timestamp}.png"))
-    open_image(os.path.join(folder_name, f"avg_polarity{timestamp}.png"))
+    #open_image(os.path.join(folder_name, f"avg_polarity{timestamp}.png"))
     plt.close()
 
     print(f"Saved avg_polarity{timestamp}.png")
@@ -243,20 +243,20 @@ def plot_avg_sentiment(avg_df, timestamp, folder_name):
     plt.xlabel("Word")
     plt.ylabel("Average Subjectivity")
     plt.savefig(os.path.join(folder_name, f"avg_subjectivity{timestamp}.png"))
-    open_image(os.path.join(folder_name, f"avg_subjectivity{timestamp}.png"))
+    #open_image(os.path.join(folder_name, f"avg_subjectivity{timestamp}.png"))
     plt.close()
 
     print(f"Saved avg_subjectivity{timestamp}.png")
 
 # Open image    
-def open_image(path):
-    system = platform.system()#This gets the operating system
-    if system == "Darwin":  # macOS
-        subprocess.call(["open", path])#This opens the image on macOS
-    elif system == "Windows":
-        os.startfile(path)#This opens the image on Windows
-    else:  # Linux
-        subprocess.call(["xdg-open", path])#This opens the image on Linux
+#def open_image(path):
+#    system = platform.system()#This gets the operating system
+#    if system == "Darwin":  # macOS
+#        subprocess.call(["open", path])#This opens the image on macOS
+#    elif system == "Windows":
+#        os.startfile(path)#This opens the image on Windows
+#    else:  # Linux
+#        subprocess.call(["xdg-open", path])#This opens the image on Linux
 
 def save_to_excel(df, timestamp, folder_name):
     filename = f"cnn_report_{timestamp}.xlsx"
