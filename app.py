@@ -329,8 +329,9 @@ def main():
     df = add_keywords(df)# This adds the keywords column to the dataframe
 
     # Create folder name for the report
+    project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = f"cnn_reports_{timestamp}"
+    folder_name = os.path.join(project_dir, f"cnn_reports_{timestamp}")
 
     # Create folder for the report
     os.makedirs(folder_name, exist_ok=True)
@@ -361,7 +362,8 @@ def main():
     save_to_csv(df, timestamp, folder_name)
 
     #Set up database
-    engine = create_engine("sqlite:///headlines.db")
+    db_path = os.path.join(project_dir, "headlines.db")
+    engine = create_engine(f"sqlite:///{db_path}")
     Session = sessionmaker(bind=engine)
     session = Session()
 
