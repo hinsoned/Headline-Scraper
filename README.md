@@ -76,5 +76,3 @@ You should see:
 ## 🔹 Notes
 
 I anticipate adding more phases to this project in the future including scraping other news sites, creating a database of scrapings from each day, hosting this information, and creating an API for this database.
-
-Test
