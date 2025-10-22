@@ -212,9 +212,9 @@ def avg_sentiment_for_top_keywords(df, word_counts):
             "avg_polarity": avg_polarity,
             "avg_subjectivity": avg_subjectivity
         })
-        print(f"Average sentiment for {word}: {avg_polarity}")
-        print(f"Average subjectivity for {word}: {avg_subjectivity}")
-        print("\n")
+       # print(f"Average sentiment for {word}: {avg_polarity}")
+       # print(f"Average subjectivity for {word}: {avg_subjectivity}")
+       # print("\n")
         
     avg_df = pd.DataFrame(avg_data)
     return avg_df
@@ -298,8 +298,24 @@ def save_to_database(df, session):
     session.commit()
     print(f"Saved {len(records)} headlines to the database.")
 
+#Get project directory
+def get_project_dir():
+    system = platform.system()
+    if system == "Darwin": #macOS
+        return "."
+    elif system == "Windows": #Windows
+        return "."
+    else: #Linux
+        return "/home/ec2-user/scraper_project/Headline-Scraper"
+
 # The pipeline
 def main():
+    #Print start time for logs
+    start_time = datetime.now()
+    print(f"Start time: {start_time}")
+    print("Starting pipeline...")
+    print("\n")
+     
     all_data = []
     # Loop through the CNN URLs and get the headlines
     for entry in CNN_URLs:
@@ -307,8 +323,8 @@ def main():
         topic = entry["topic"]
 
         headlines = get_headlines(url)#This returns a list of headlines
-        print_headlines(headlines, url)
-        print("\n")
+        #print_headlines(headlines, url)
+        #print("\n")
 
         timestamp = datetime.now()
         for headline in headlines:
@@ -329,7 +345,8 @@ def main():
     df = add_keywords(df)# This adds the keywords column to the dataframe
 
     # Create folder name for the report
-    project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
+    #project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
+    project_dir = get_project_dir()
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     folder_name = os.path.join(project_dir, f"cnn_reports_{timestamp}")
 
@@ -381,7 +398,7 @@ def main():
     print("Keywords like '%trump%'")
     print("\n")
 
-    for r in results:
+    for r in results[:10]:
         print(r.headline)
     print(len(results))
 
@@ -392,7 +409,7 @@ def main():
     print("Polarity > 0.5 and Subjectivity < 0.5")
     print("\n")
     
-    for r in next_results:
+    for r in next_results[:10]:
         print(r.headline)
     print(len(next_results))
 
