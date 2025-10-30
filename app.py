@@ -157,12 +157,12 @@ def plot_sentiment(df, timestamp, folder_name):
 def most_subjective_headlines(df):
     subjective_df = df.sort_values(by="subjectivity", ascending=False)
     print(f"Most subjective headlines: \n")
-    for index, row in subjective_df.head(10).iterrows():
+    for index, row in subjective_df.head(5).iterrows():
         print(f"{index}. {row['headline']} | Subjectivity: {row['subjectivity']} | Topic: {row['topic']}")
     print("\n")
 
     print(f"Least subjective headlines: \n")
-    for index, row in subjective_df.tail(10).iterrows():
+    for index, row in subjective_df.tail(5).iterrows():
         print(f"{index}. {row['headline']} | Subjectivity: {row['subjectivity']} | Topic: {row['topic']}")
     print("\n")
 
@@ -174,12 +174,12 @@ def most_subjective_headlines(df):
 def most_polar_headlines(df):
     polar_df = df.sort_values(by="polarity", ascending=False)
     print(f"Most polar headlines: \n")
-    for index, row in polar_df.head(10).iterrows():
+    for index, row in polar_df.head(5).iterrows():
         print(f"{index}. {row['headline']} | Polarity: {row['polarity']} | Topic: {row['topic']}")  
     print("\n")
 
     print(f"Least polar headlines: \n")
-    for index, row in polar_df.tail(10).iterrows():
+    for index, row in polar_df.tail(5).iterrows():
         print(f"{index}. {row['headline']} | Polarity: {row['polarity']} | Topic: {row['topic']}")
     print("\n")
 
@@ -398,7 +398,7 @@ def main():
     print("Keywords like '%trump%'")
     print("\n")
 
-    for r in results[:10]:
+    for r in results[:5]:
         print(r.headline)
     print(len(results))
 
@@ -409,7 +409,7 @@ def main():
     print("Polarity > 0.5 and Subjectivity < 0.5")
     print("\n")
     
-    for r in next_results[:10]:
+    for r in next_results[:5]:
         print(r.headline)
     print(len(next_results))
 

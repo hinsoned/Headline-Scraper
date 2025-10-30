@@ -6,3 +6,4 @@ cnn_headlines.csv
 cnn_headlines_*.csv
 cnn_reports_*
 headlines.db
+*.db
