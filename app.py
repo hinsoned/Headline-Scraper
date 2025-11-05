@@ -312,6 +312,7 @@ def get_project_dir():
 def main():
     #Print start time for logs
     start_time = datetime.now()
+    start_time_str = start_time.strftime("%Y-%m-%d_%H-%M-%S")
     print(f"Start time: {start_time}")
     print("Starting pipeline...")
     print("\n")
@@ -326,10 +327,10 @@ def main():
         #print_headlines(headlines, url)
         #print("\n")
 
-        timestamp = datetime.now()
+        #timestamp = datetime.now()
         for headline in headlines:
             all_data.append({
-                "timestamp": timestamp,
+                "timestamp": start_time,
                 "headline": headline,
                 "url": url,
                 "topic": topic
@@ -347,8 +348,8 @@ def main():
     # Create folder name for the report
     #project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
     project_dir = get_project_dir()
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = os.path.join(project_dir, f"cnn_reports_{timestamp}")
+    #timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    folder_name = os.path.join(project_dir, f"cnn_reports_{start_time_str}")
 
     # Create folder for the report
     os.makedirs(folder_name, exist_ok=True)
@@ -359,10 +360,10 @@ def main():
     word_counts = create_counter(all_words)
 
     # Create plot for word counts to visualize the most common words
-    plot_word_counts(word_counts, timestamp, folder_name)
+    plot_word_counts(word_counts, start_time_str, folder_name)
 
     # Create plot for sentiment
-    plot_sentiment(df, timestamp, folder_name) 
+    plot_sentiment(df, start_time_str, folder_name) 
 
     #Most subjective and polar headlines
     subjective_df = most_subjective_headlines(df)
@@ -370,13 +371,13 @@ def main():
 
     # Get average sentiment for top keywords
     avg_df = avg_sentiment_for_top_keywords(df, word_counts)
-    plot_avg_sentiment(avg_df, timestamp, folder_name)
+    plot_avg_sentiment(avg_df, start_time_str, folder_name)
 
     # Save dataframe to excel
-    save_to_excel(df, timestamp, folder_name)
+    save_to_excel(df, start_time_str, folder_name)
 
     # Save dataframe to csv
-    save_to_csv(df, timestamp, folder_name)
+    save_to_csv(df, start_time_str, folder_name)
 
     #Set up database
     db_path = os.path.join(project_dir, "headlines.db")
