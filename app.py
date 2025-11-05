@@ -1,4 +1,5 @@
 #Headline Scraper
+#app.py is the main file for the headline scraper project
 
 import requests
 from bs4 import BeautifulSoup
