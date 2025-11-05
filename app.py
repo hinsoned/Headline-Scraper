@@ -157,12 +157,12 @@ def plot_sentiment(df, timestamp, folder_name):
 def most_subjective_headlines(df):
     subjective_df = df.sort_values(by="subjectivity", ascending=False)
     print(f"Most subjective headlines: \n")
-    for index, row in subjective_df.head(10).iterrows():
+    for index, row in subjective_df.head(5).iterrows():
         print(f"{index}. {row['headline']} | Subjectivity: {row['subjectivity']} | Topic: {row['topic']}")
     print("\n")
 
     print(f"Least subjective headlines: \n")
-    for index, row in subjective_df.tail(10).iterrows():
+    for index, row in subjective_df.tail(5).iterrows():
         print(f"{index}. {row['headline']} | Subjectivity: {row['subjectivity']} | Topic: {row['topic']}")
     print("\n")
 
@@ -174,12 +174,12 @@ def most_subjective_headlines(df):
 def most_polar_headlines(df):
     polar_df = df.sort_values(by="polarity", ascending=False)
     print(f"Most polar headlines: \n")
-    for index, row in polar_df.head(10).iterrows():
+    for index, row in polar_df.head(5).iterrows():
         print(f"{index}. {row['headline']} | Polarity: {row['polarity']} | Topic: {row['topic']}")  
     print("\n")
 
     print(f"Least polar headlines: \n")
-    for index, row in polar_df.tail(10).iterrows():
+    for index, row in polar_df.tail(5).iterrows():
         print(f"{index}. {row['headline']} | Polarity: {row['polarity']} | Topic: {row['topic']}")
     print("\n")
 
@@ -212,9 +212,9 @@ def avg_sentiment_for_top_keywords(df, word_counts):
             "avg_polarity": avg_polarity,
             "avg_subjectivity": avg_subjectivity
         })
-        print(f"Average sentiment for {word}: {avg_polarity}")
-        print(f"Average subjectivity for {word}: {avg_subjectivity}")
-        print("\n")
+       # print(f"Average sentiment for {word}: {avg_polarity}")
+       # print(f"Average subjectivity for {word}: {avg_subjectivity}")
+       # print("\n")
         
     avg_df = pd.DataFrame(avg_data)
     return avg_df
@@ -298,8 +298,25 @@ def save_to_database(df, session):
     session.commit()
     print(f"Saved {len(records)} headlines to the database.")
 
+#Get project directory
+def get_project_dir():
+    system = platform.system()
+    if system == "Darwin": #macOS
+        return "."
+    elif system == "Windows": #Windows
+        return "."
+    else: #Linux
+        return "/home/ec2-user/scraper_project/Headline-Scraper"
+
 # The pipeline
 def main():
+    #Print start time for logs
+    start_time = datetime.now()
+    start_time_str = start_time.strftime("%Y-%m-%d_%H-%M-%S")
+    print(f"Start time: {start_time}")
+    print("Starting pipeline...")
+    print("\n")
+     
     all_data = []
     # Loop through the CNN URLs and get the headlines
     for entry in CNN_URLs:
@@ -307,13 +324,13 @@ def main():
         topic = entry["topic"]
 
         headlines = get_headlines(url)#This returns a list of headlines
-        print_headlines(headlines, url)
-        print("\n")
+        #print_headlines(headlines, url)
+        #print("\n")
 
-        timestamp = datetime.now()
+        #timestamp = datetime.now()
         for headline in headlines:
             all_data.append({
-                "timestamp": timestamp,
+                "timestamp": start_time,
                 "headline": headline,
                 "url": url,
                 "topic": topic
@@ -329,9 +346,10 @@ def main():
     df = add_keywords(df)# This adds the keywords column to the dataframe
 
     # Create folder name for the report
-    project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = os.path.join(project_dir, f"cnn_reports_{timestamp}")
+    #project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
+    project_dir = get_project_dir()
+    #timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    folder_name = os.path.join(project_dir, f"cnn_reports_{start_time_str}")
 
     # Create folder for the report
     os.makedirs(folder_name, exist_ok=True)
@@ -342,10 +360,10 @@ def main():
     word_counts = create_counter(all_words)
 
     # Create plot for word counts to visualize the most common words
-    plot_word_counts(word_counts, timestamp, folder_name)
+    plot_word_counts(word_counts, start_time_str, folder_name)
 
     # Create plot for sentiment
-    plot_sentiment(df, timestamp, folder_name) 
+    plot_sentiment(df, start_time_str, folder_name) 
 
     #Most subjective and polar headlines
     subjective_df = most_subjective_headlines(df)
@@ -353,13 +371,13 @@ def main():
 
     # Get average sentiment for top keywords
     avg_df = avg_sentiment_for_top_keywords(df, word_counts)
-    plot_avg_sentiment(avg_df, timestamp, folder_name)
+    plot_avg_sentiment(avg_df, start_time_str, folder_name)
 
     # Save dataframe to excel
-    save_to_excel(df, timestamp, folder_name)
+    save_to_excel(df, start_time_str, folder_name)
 
     # Save dataframe to csv
-    save_to_csv(df, timestamp, folder_name)
+    save_to_csv(df, start_time_str, folder_name)
 
     #Set up database
     db_path = os.path.join(project_dir, "headlines.db")
@@ -381,7 +399,7 @@ def main():
     print("Keywords like '%trump%'")
     print("\n")
 
-    for r in results:
+    for r in results[:5]:
         print(r.headline)
     print(len(results))
 
@@ -392,7 +410,7 @@ def main():
     print("Polarity > 0.5 and Subjectivity < 0.5")
     print("\n")
     
-    for r in next_results:
+    for r in next_results[:5]:
         print(r.headline)
     print(len(next_results))
 
