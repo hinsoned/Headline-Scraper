@@ -345,13 +345,13 @@ def main():
     # Add keywords to dataframe
     df = add_keywords(df)# This adds the keywords column to the dataframe
 
-    # Create folder name for the report
-    #project_dir = "/home/ec2-user/scraper_project/Headline-Scraper"
+    #Create a parent directory for the reports
     project_dir = get_project_dir()
-    #timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    folder_name = os.path.join(project_dir, f"cnn_reports_{start_time_str}")
+    reports_dir = os.path.join(project_dir, "reports_dir")
+    os.makedirs(reports_dir, exist_ok=True)
 
-    # Create folder for the report
+    # Create folder name for the report and create the folder if it doesn't exist
+    folder_name = os.path.join(reports_dir, f"cnn_reports_{start_time_str}")
     os.makedirs(folder_name, exist_ok=True)
 
     # Create a list of all the words in the headlines after cleaning
