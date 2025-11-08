@@ -1,0 +1,95 @@
+{% extends "base.html" %} {% block title %}Today's Headlines - Headline
+Scraper{% endblock %} {% block content %}
+<div class="container py-5">
+  <div class="card shadow-lg mb-4">
+    <div class="card-body text-center">
+      <h1 class="card-title mb-3">📰 Today's Headlines</h1>
+      <p class="text-muted mb-3">
+        Headlines scraped at 8 am EST today with sentiment analysis
+      </p>
+      <a href="/" class="btn btn-link">← Back to Home</a>
+    </div>
+  </div>
+
+  <div id="stats-container" class="card shadow-lg mb-4" style="display: none">
+    <div class="card-body">
+      <div class="row text-center">
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h2 class="text-primary" id="total-headlines">0</h2>
+          <p class="text-muted text-uppercase small">Total Headlines</p>
+        </div>
+        <div class="col-md-4 mb-3 mb-md-0">
+          <h2 class="text-primary" id="avg-polarity">0.000</h2>
+          <p class="text-muted text-uppercase small">Avg Polarity</p>
+        </div>
+        <div class="col-md-4">
+          <h2 class="text-primary" id="avg-subjectivity">0.000</h2>
+          <p class="text-muted text-uppercase small">Avg Subjectivity</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="headlines-container" class="card shadow-lg">
+    <div class="card-body">
+      <div id="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading headlines...</p>
+      </div>
+      <div id="headlines-list"></div>
+      <div id="no-headlines" class="text-center py-5" style="display: none">
+        <h2 class="mb-3">No headlines found for today</h2>
+        <p class="text-muted">
+          There are no headlines in the database for today. Run the scraper to
+          collect today's headlines.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_scripts %}
+<script>
+  function loadTodaysHeadlines() {
+    fetch("/api/todays_headlines")
+      .then((response) => response.json())
+      .then((data) => {
+        const loadingDiv = document.getElementById("loading");
+        loadingDiv.style.display = "none";
+
+        console.log(data);
+        data.forEach((headline) => {
+          const headlineDiv = document.createElement("div");
+          headlineDiv.className = "border-bottom pb-3 mb-3";
+          headlineDiv.innerHTML = `<h5 class="mb-3">${headline.headline}</h5>
+          <div class="d-flex flex-wrap gap-3 align-items-center">
+            <div>
+              <span class="badge bg-info ms-1">${headline.polarity}</span>
+            </div>
+            <div>
+              <span class="badge bg-info ms-1">${headline.subjectivity}</span>
+            </div>
+            <div>
+              <span class="badge bg-info ms-1">${headline.timestamp}</span>
+            </div>
+            <div>
+              <span class="badge bg-info ms-1">${headline.url}</span>
+            </div>
+            <div>
+              <span class="badge bg-info ms-1">${headline.topic}</span>
+            </div>
+          </div>
+        </div>`;
+          document.getElementById("headlines-list").appendChild(headlineDiv);
+        });
+      })
+      .catch((error) => {
+        console.error("Error loading headlines:", error);
+      });
+  }
+
+  // Load headlines when page loads
+  document.addEventListener("DOMContentLoaded", loadTodaysHeadlines);
+</script>
+{% endblock %}

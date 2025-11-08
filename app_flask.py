@@ -5,6 +5,11 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from app import Headline
+from flask import jsonify
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from sqlalchemy import func
 
 db_path = os.path.join(os.path.dirname(__file__), "headlines.db") #Gets the path to the database
 engine = create_engine(f"sqlite:///{db_path}") #Creates the engine for the database
@@ -15,21 +20,43 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return "This is the headline scraper project using Flask!"
+    return render_template("index.html")
 
     
-@app.route("/headlines")
+@app.route("/todays_headlines")
 def headlines():
+  
+    return render_template("todays_headlines.html")
+
+@app.route("/api/todays_headlines")
+def api_todays_headlines():
     session = Session() #Creates the session for the database
-    headlines = session.query(Headline).all()
-    #print(headlines)
+    today = date.today()
+    # returns a python list of headline objects where the timestamp is today
+    headlines = session.query(Headline).filter(func.date(Headline.timestamp) == today).all()
+    #print(f"These are the headlines for today: {headlines}") #for debugging
 
-    html_headlines = "<h1>Headlines</h1> <br> <p>Headline | Polarity | Subjectivity</p>"
+    #convert the headline objects to a list of dictionaries
+    headlines_list = []#This is a list of dictionaries
     for headline in headlines:
-        html_headlines += f"<p>{headline.headline} | {headline.polarity} | {headline.subjectivity} </p>"
-
+        headlines_list.append({
+            "timestamp": headline.timestamp,
+            "headline": headline.headline,
+            "url": headline.url,
+            "topic": headline.topic,
+            "polarity": headline.polarity,
+            "subjectivity": headline.subjectivity,
+            "keywords": headline.keywords
+        })
+    #for debugging
+    print(f"These are the headlines for today: {headlines_list}") 
+    headlines[0].timestamp = today 
+    print (f"today is {today}")
+    print (type(today))
+    
+    #close the session
     session.close()
-    return html_headlines
+    return jsonify(headlines_list)
 
 if __name__ == "__main__":
     app.run(debug=True)
