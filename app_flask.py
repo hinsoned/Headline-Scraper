@@ -31,10 +31,11 @@ def headlines():
 @app.route("/api/todays_headlines")
 def api_todays_headlines():
     session = Session() #Creates the session for the database
-    today = date.today()
+    #today = date.today()
+    latest_timestamp = session.query(func.max(Headline.timestamp)).scalar()
+    print(f"The latest timestamp is: {latest_timestamp}")
     # returns a python list of headline objects where the timestamp is today
-    headlines = session.query(Headline).filter(func.date(Headline.timestamp) == today).all()
-    #print(f"These are the headlines for today: {headlines}") #for debugging
+    headlines = session.query(Headline).filter(Headline.timestamp == latest_timestamp).all()
 
     #convert the headline objects to a list of dictionaries
     headlines_list = []#This is a list of dictionaries
@@ -50,10 +51,7 @@ def api_todays_headlines():
         })
     #for debugging
     print(f"These are the headlines for today: {headlines_list}") 
-    headlines[0].timestamp = today 
-    print (f"today is {today}")
-    print (type(today))
-    
+
     #close the session
     session.close()
     return jsonify(headlines_list)

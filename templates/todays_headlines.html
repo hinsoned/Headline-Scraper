@@ -3,7 +3,7 @@ Scraper{% endblock %} {% block content %}
 <div class="container py-5">
   <div class="card shadow-lg mb-4">
     <div class="card-body text-center">
-      <h1 class="card-title mb-3">📰 Today's Headlines</h1>
+      <h1 class="card-title mb-3">Today's Headlines</h1>
       <p class="text-muted mb-3">
         Headlines scraped at 8 am EST today with sentiment analysis
       </p>
@@ -38,7 +38,25 @@ Scraper{% endblock %} {% block content %}
         </div>
         <p class="mt-3 text-muted">Loading headlines...</p>
       </div>
-      <div id="headlines-list"></div>
+      <div class="table-responsive">
+        <table
+          class="table table-striped table-hover"
+          id="headlines-table"
+          style="display: none"
+        >
+          <thead class="table-dark">
+            <tr>
+              <th>Headline</th>
+              <th>Polarity</th>
+              <th>Subjectivity</th>
+              <th>Topic</th>
+              <th>Timestamp</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody id="headlines-list"></tbody>
+        </table>
+      </div>
       <div id="no-headlines" class="text-center py-5" style="display: none">
         <h2 class="mb-3">No headlines found for today</h2>
         <p class="text-muted">
@@ -56,36 +74,69 @@ Scraper{% endblock %} {% block content %}
       .then((response) => response.json())
       .then((data) => {
         const loadingDiv = document.getElementById("loading");
+        const headlinesTable = document.getElementById("headlines-table");
+        const headlinesList = document.getElementById("headlines-list");
+        const noHeadlines = document.getElementById("no-headlines");
+
         loadingDiv.style.display = "none";
 
-        console.log(data);
-        data.forEach((headline) => {
-          const headlineDiv = document.createElement("div");
-          headlineDiv.className = "border-bottom pb-3 mb-3";
-          headlineDiv.innerHTML = `<h5 class="mb-3">${headline.headline}</h5>
-          <div class="d-flex flex-wrap gap-3 align-items-center">
-            <div>
-              <span class="badge bg-info ms-1">${headline.polarity}</span>
-            </div>
-            <div>
-              <span class="badge bg-info ms-1">${headline.subjectivity}</span>
-            </div>
-            <div>
-              <span class="badge bg-info ms-1">${headline.timestamp}</span>
-            </div>
-            <div>
-              <span class="badge bg-info ms-1">${headline.url}</span>
-            </div>
-            <div>
-              <span class="badge bg-info ms-1">${headline.topic}</span>
-            </div>
-          </div>
-        </div>`;
-          document.getElementById("headlines-list").appendChild(headlineDiv);
-        });
+        if (data && data.length > 0) {
+          headlinesTable.style.display = "table";
+          data.forEach((headline) => {
+            const row = document.createElement("tr");
+
+            const polarityClass =
+              headline.polarity > 0.1
+                ? "bg-success"
+                : headline.polarity < -0.1
+                ? "bg-danger"
+                : "bg-secondary";
+
+            const polarityBadge =
+              headline.polarity !== null && headline.polarity !== undefined
+                ? `<span class="badge ${polarityClass}">${headline.polarity.toFixed(
+                    3
+                  )}</span>`
+                : "N/A";
+
+            const subjectivityBadge =
+              headline.subjectivity !== null &&
+              headline.subjectivity !== undefined
+                ? `<span class="badge bg-info">${headline.subjectivity.toFixed(
+                    3
+                  )}</span>`
+                : "N/A";
+
+            const topicBadge = headline.topic
+              ? `<span class="badge bg-warning text-dark">${headline.topic}</span>`
+              : "N/A";
+
+            const timestamp = headline.timestamp
+              ? new Date(headline.timestamp).toLocaleString()
+              : "N/A";
+
+            const urlLink = headline.url
+              ? `<a href="${headline.url}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>`
+              : "N/A";
+
+            row.innerHTML = `
+              <td>${headline.headline || "N/A"}</td>
+              <td>${polarityBadge}</td>
+              <td>${subjectivityBadge}</td>
+              <td>${topicBadge}</td>
+              <td>${timestamp}</td>
+              <td>${urlLink}</td>
+            `;
+            headlinesList.appendChild(row);
+          });
+        } else {
+          noHeadlines.style.display = "block";
+        }
       })
       .catch((error) => {
         console.error("Error loading headlines:", error);
+        document.getElementById("loading").innerHTML =
+          '<p class="text-danger">Error loading headlines. Please try again later.</p>';
       });
   }
 
