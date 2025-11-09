@@ -43,6 +43,10 @@ stopwords = set(stopwords.words("english"))
 STATIC_IMAGES_DIR = os.path.join(os.path.dirname(__file__), "static", "images")
 os.makedirs(STATIC_IMAGES_DIR, exist_ok=True)
 
+#Create path to data folder
+STATIC_DATA_DIR = os.path.join(os.path.dirname(__file__), "static", "data")
+os.makedirs(STATIC_DATA_DIR, exist_ok=True)
+
 # CNN URLs and topics
 CNN_URLs = [
         {"url": "https://www.cnn.com", "topic": "General"},
@@ -278,8 +282,13 @@ def save_to_excel(df, timestamp, folder_name):
 def save_to_csv(df, timestamp, folder_name):
     csv_filename = f"cnn_headlines_{timestamp}.csv"
     csv_path = os.path.join(folder_name, csv_filename)
+    
     df.to_csv(csv_path, index=False)
     print(f"Data saved to {csv_path}")
+
+    static_csv_path = os.path.join(STATIC_DATA_DIR, "cnn_headlines.csv")
+    df.to_csv(static_csv_path, index=False)
+    print(f"Data saved to {static_csv_path}")
 
 def save_to_database(df, session):
     # Convert the keywords column to JSON strings for all rows at once

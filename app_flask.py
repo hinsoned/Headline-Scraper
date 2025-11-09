@@ -10,11 +10,13 @@ from datetime import date
 from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import func
+from flask import send_from_directory
 
 db_path = os.path.join(os.path.dirname(__file__), "headlines.db") #Gets the path to the database
 engine = create_engine(f"sqlite:///{db_path}") #Creates the engine for the database
 Session = sessionmaker(bind=engine) #Creates the session factory for the database
 
+STATIC_DATA_DIR = os.path.join(os.path.dirname(__file__), "static", "data")
 
 app = Flask(__name__)
 
@@ -55,6 +57,10 @@ def api_todays_headlines():
     #close the session
     session.close()
     return jsonify(headlines_list)
+
+@app.route("/download_data")
+def download_data():
+    return send_from_directory(STATIC_DATA_DIR, "cnn_headlines.csv", as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=True)
