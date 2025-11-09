@@ -8,3 +8,8 @@ cnn_reports_*
 headlines.db
 *.db
 /__pycache__
+static/images/word_counts.png
+static/images/avg_polarity.png
+static/images/avg_subjectivity.png
+static/images/sentiment.png
+static/images/subjectivity.png

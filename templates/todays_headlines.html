@@ -30,6 +30,74 @@ Scraper{% endblock %} {% block content %}
     </div>
   </div>
 
+  <div class="card shadow-lg mb-4">
+    <div class="card-body">
+      <h3 class="card-title mb-4 text-center">Visualizations</h3>
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">Word Counts</h5>
+              <img
+                src="{{ url_for('static', filename='images/word_counts.png') }}"
+                class="img-fluid rounded"
+                alt="Word Counts"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">Sentiment Distribution</h5>
+              <img
+                src="{{ url_for('static', filename='images/sentiment.png') }}"
+                class="img-fluid rounded"
+                alt="Sentiment"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">Subjectivity Distribution</h5>
+              <img
+                src="{{ url_for('static', filename='images/subjectivity.png') }}"
+                class="img-fluid rounded"
+                alt="Subjectivity"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">Average Polarity by Keyword</h5>
+              <img
+                src="{{ url_for('static', filename='images/avg_polarity.png') }}"
+                class="img-fluid rounded"
+                alt="Average Polarity"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-6">
+          <div class="card h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">Average Subjectivity by Keyword</h5>
+              <img
+                src="{{ url_for('static', filename='images/avg_subjectivity.png') }}"
+                class="img-fluid rounded"
+                alt="Average Subjectivity"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="headlines-container" class="card shadow-lg">
     <div class="card-body">
       <div id="loading" class="text-center py-5">
