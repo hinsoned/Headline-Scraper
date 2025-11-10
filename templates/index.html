@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Headline Scraper - Home{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-lg" style="max-width: 600px; width: 100%;">
+        <div class="card-body text-center p-5">
+            <h1 class="card-title mb-4">📰 Headline Scraper</h1>
+            <p class="card-text text-muted mb-4">Welcome to the Headline Scraper project! This application scrapes CNN headlines and performs sentiment analysis to help you understand the tone and subjectivity of news articles.</p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="/todays_headlines" class="btn btn-danger btn-lg">Today's Headlines</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
