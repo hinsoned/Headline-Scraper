@@ -11,6 +11,7 @@ from datetime import datetime
 from datetime import timedelta
 from sqlalchemy import func
 from flask import send_from_directory
+from waitress import serve
 
 db_path = os.path.join(os.path.dirname(__file__), "headlines.db") #Gets the path to the database
 engine = create_engine(f"sqlite:///{db_path}") #Creates the engine for the database
@@ -62,5 +63,10 @@ def api_todays_headlines():
 def download_data():
     return send_from_directory(STATIC_DATA_DIR, "cnn_headlines.csv", as_attachment=True)
 
+mode = ""
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    if mode == "development":
+        app.run(debug=True)
+    else:
+        serve(app, host="0.0.0.0", port=8080, threads=6, connection_limit=100)
