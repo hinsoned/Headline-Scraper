@@ -53,7 +53,7 @@ def api_todays_headlines():
             "keywords": headline.keywords
         })
     #for debugging
-    print(f"These are the headlines for today: {headlines_list}") 
+    #print(f"These are the headlines for today: {headlines_list}") 
 
     #close the session
     session.close()
